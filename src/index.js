@@ -13,7 +13,7 @@ class Game {
 
 	this.canvas.width = window.innerWidth;
 	this.canvas.height = window.innerHeight;
-	this.gl.viewport (0, 0, this.canvas.width, this.canvas.height);
+	this.gl.viewport (0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
 	this.gl.clearColor (0.3, 0.1, 0.5, 1.0);
 
 	// Set up a simple triangle for testing camera code.
@@ -40,7 +40,9 @@ class Game {
 	this.shader.add (this.gl.FRAGMENT_SHADER, $("chunk.fs").text.trim ());
 	this.shader.link ();
 	this.shader.use ();
-	
+
+	this.lastTime = 0;
+	this.deltaTime = 0;
 	this.request = window.requestAnimationFrame (this.loop.bind (this));
     }
 
@@ -51,7 +53,9 @@ class Game {
     }
 
     update (timestamp) {
-	
+	this.deltaTime = (timestamp - this.lastTime);
+	this.lastTime = timestamp;
+	$("fps").innerText = (1 / (this.deltaTime * 0.001)).toFixed (1);
     }
 
     render () {

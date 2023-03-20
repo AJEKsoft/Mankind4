@@ -1,0 +1,4 @@
+* [ ] Basic math functions, vectors and matrices
+* [ ] Camera class
+* [ ] Some mesh classes, as well as a chunk mesh
+* [ ] IMPORTANT: messaging system for inter-class communication

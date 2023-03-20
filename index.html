@@ -7,7 +7,9 @@
     <!-- Some simple style. -->
     <style>
       body { margin: 0; overflow: hidden; }
-      #gl-canvas { width: 100vw; height: 100vh }
+      #gl-canvas, #ui-overlay { width: 100vw; height: 100vh }
+      #ui-overlay { position: absolute; pointer-events: none; padding: 1em; }
+      #ui-overlay span { font-size: 32px; font-family: sans-serif; -webkit-text-stroke: 1px white; }
     </style>
 
     <!-- Shaders. -->
@@ -37,6 +39,10 @@
   </head>
 
   <body>
+    <div id="ui-overlay">
+      <span>FPS: <span id="fps">0</span></span>
+    </div>
+    
     <canvas id="gl-canvas"></canvas>
   </body>
 </html>
