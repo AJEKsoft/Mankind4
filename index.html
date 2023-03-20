@@ -12,11 +12,27 @@
 
     <!-- Shaders. -->
     <script type="text/plain" id="chunk.vs" async>
+      #version 300 es
+
+      in vec4 vpos;
+
+      void main () {
+	  gl_Position = vpos;
+      }
     </script>
 
     <script type="text/plain" id="chunk.fs" async>
+      #version 300 es
+      precision highp float;
+
+      out vec4 color;
+
+      void main () {
+	  color = vec4 (1, 1, 1, 1);
+      }
     </script>
     <!-- Scripts. -->
+    <script src="src/program.js" defer></script>
     <script src="src/index.js" defer></script>
   </head>
 
