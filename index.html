@@ -18,8 +18,10 @@
 
       in vec4 vpos;
 
+      uniform mat4 view, projection;
+      
       void main () {
-	  gl_Position = vpos;
+	  gl_Position = view * projection * vpos;
       }
     </script>
 
@@ -33,8 +35,12 @@
 	  color = vec4 (1, 1, 1, 1);
       }
     </script>
+    
     <!-- Scripts. -->
-    <script src="src/program.js" defer></script>
+    <script src="src/math.js" async></script>
+    <script src="src/camera.js" async></script>
+    <script src="src/program.js" async></script>
+    <script src="src/mesh.js" async></script>
     <script src="src/index.js" defer></script>
   </head>
 
