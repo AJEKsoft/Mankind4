@@ -2,4 +2,5 @@
 [X] Camera class
 [X] Some mesh classes, as well as a chunk mesh
 [ ] Fix camera perspective calculation
+[ ] Fix lighting calculation in shader
 [ ] IMPORTANT: messaging system for inter-class communication
