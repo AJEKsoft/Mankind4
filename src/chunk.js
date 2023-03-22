@@ -32,7 +32,7 @@ class Chunk {
 		    if (Math.sqrt ((x - this.length / 2) * (x - this.length / 2) + (y - this.length / 2) * (y - this.length / 2) + (z - this.length / 2) * (z - this.length / 2)) <= this.length / 2) {
 			this.getAt (x, y, z).active = true;
 			this.getAt (x, y, z).color = new Vec3 (0.0, Math.random () * (1.0 - 0.5) + 0.5, 0.0);
-			this.getAt (x, y, z).light = 1.0;
+			this.getAt (x, y, z).light = 0.2;
 		    }
 		}
 	    }

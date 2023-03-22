@@ -33,10 +33,6 @@ class VertexMesh {
 const CHUNK_DIM = 32;
 const CHUNK_SIZE = CHUNK_DIM * CHUNK_DIM * CHUNK_DIM;
 
-function color8 (r, g, b) {
-    return ((r & 0x7) << 0) | ((g & 0x7) << 3) | ((b & 0x3) << 6);
-}
-
 class ChunkMesh {
     // Reference to current GL context.
     #gl;
@@ -51,30 +47,6 @@ class ChunkMesh {
     // A buffer holding extra information, per-voxel.
     #vebo;
     
-    // All of the following should be in a seperate chunk class, as it
-    // really has more to do with a Chunk than with its mesh. The mesh
-    // should merely pack all of this data into suitable buffers (or a
-    // single buffer).
-    
-    // Here, we begin the per-voxel information. First, every voxel
-    // has its colour: for now, we stick to an 8-bit color — red,
-    // green and blue packed into a single byte.
-    colors = new Array;
-    // We use another byte to store other information. How this
-    // particular byte is used is as follows (each point in the list
-    // is a bit):
-    //
-    // 1. whether the voxel is visible or not, either true or false
-    // 2. reserved for lighting level
-    // 3. - || -
-    // 4. - || -
-    // 5. - || -
-    // 6. - || -
-    // 7. - || -
-    // 8. - || -
-    visible = new Array;
-    lighting = new Array;
-    
     constructor (gl) {
 	this.#gl = gl;
 	this.#vao = this.#gl.createVertexArray ();
@@ -83,8 +55,6 @@ class ChunkMesh {
 	this.#vcbo = this.#gl.createBuffer ();
 	this.#vebo = this.#gl.createBuffer ();
 
-	this.debugFill ();
-	
 	this.#gl.bindVertexArray (this.#vao);
 	// Generate the quad buffer — this is the "voxel". First, we
 	// start with the vertices.
@@ -115,14 +85,27 @@ class ChunkMesh {
 	    let r = Math.floor (color.x * 7);
 	    let g = Math.floor (color.y * 7);
 	    let b = Math.floor (color.z * 3);
-	    colors[i] = color8 (r, g, b);
+	    // The red and green store 8 color values, while the blue
+	    // color stores 4. I think image sensors in cameras do
+	    // something similar.
+	    colors[i] |= b << 6;
+	    colors[i] |= g << 3;
+	    colors[i] |= r;
 	}
 
-	// Now, which voxels are visible and which are not.
-	let active = new Uint8Array (chunk.size);
+	// And we calculate the "extra" attributes.
+	let extra = new Uint8Array (chunk.size);
 	for (let i = 0; i < chunk.size; ++i) {
-	    active[i] = chunk.voxels[i].active ? 1 : 0;
+	    let active = chunk.voxels[i].active ? 1 : 0;
+	    // Here, we convert the light value of the voxels, which
+	    // is a normalized float, to a byte value.
+	    let light = Math.floor (chunk.voxels[i].light * 127);
+	    // Now, we pack both those values into one byte. How? Here's how...
+	    extra[i] |= light << 1;
+	    extra[i] |= active;
 	}
+
+	console.log (extra);
 	
 	// Generate the color buffer.
 	this.#gl.bindBuffer (this.#gl.ARRAY_BUFFER, this.#vcbo);
@@ -134,25 +117,11 @@ class ChunkMesh {
 
 	// Generate the extra information buffer.
 	this.#gl.bindBuffer (this.#gl.ARRAY_BUFFER, this.#vebo);
-	this.#gl.bufferData (this.#gl.ARRAY_BUFFER, new Uint8Array (active), this.#gl.STATIC_DRAW);
+	this.#gl.bufferData (this.#gl.ARRAY_BUFFER, new Uint8Array (extra), this.#gl.STATIC_DRAW);
 	// Per-instance.
 	this.#gl.enableVertexAttribArray (2);
 	this.#gl.vertexAttribIPointer (2, 1, this.#gl.UNSIGNED_BYTE, false, 0, 0);
 	this.#gl.vertexAttribDivisor (2, 1);
-    }
-
-    // This function fills the colors, visible, and lighting variables
-    // with some random gibberish for debugging.
-    debugFill () {
-	for (let i = 0; i < CHUNK_SIZE; ++i) {
-	    this.colors[i] = Math.floor (Math.random () * 255);
-
-	    if (Math.random () > 0.9) {
-		this.visible[i] = 1;
-	    } else {
-		this.visible[i] = 0;
-	    }
-	}
     }
 
     render () {

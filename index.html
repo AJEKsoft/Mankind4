@@ -22,6 +22,7 @@
 
       out vec4 vcolor;
       flat out uint von;
+      flat out float vlight;
       
       uniform mat4 view, projection;
 
@@ -37,12 +38,13 @@
 	  gl_Position = projection * view * vec4 (voxel_pos, 1.0);
 	  gl_Position.xy += vec2 (vpos.x, vpos.y);
 
-	  float r = float ((color >> 0) & uint (0x7)) / 7.0;
-	  float g = float ((color >> 3) & uint (0x7)) / 7.0;
-	  float b = float ((color >> 6) & uint (0x3)) / 3.0;
-
+	  float r = float (color & uint (7)) / 7.0;
+	  float g = float ((color >> 3) & uint (7)) / 7.0;
+	  float b = float ((color >> 6) & uint (3)) / 3.0;
+	  
 	  vcolor = vec4 (r, g, b, 1.0);
-	  von = extra;
+	  von = extra & uint (1);
+	  vlight = float ((extra >> 1) & uint (127)) / 127.0;
       }
     </script>
 
@@ -52,6 +54,7 @@
 
       in vec4 vcolor;
       flat in uint von;
+      flat in float vlight;
       
       out vec4 color;
 
