@@ -66,6 +66,7 @@ class Game {
 	
 	this.lastTime = 0;
 	this.deltaTime = 0;
+	this.guiInterval = window.setInterval (this.guiUpdate.bind (this), 1000);
 	this.request = window.requestAnimationFrame (this.loop.bind (this));
     }
 
@@ -75,10 +76,14 @@ class Game {
 	this.request = window.requestAnimationFrame (this.loop.bind (this));
     }
 
+    // This runs differently than each frame.
+    guiUpdate () {
+	$("fps").innerText = (1 / (this.deltaTime * 0.001)).toFixed (1);
+    }
+    
     update (timestamp) {
 	this.deltaTime = (timestamp - this.lastTime);
 	this.lastTime = timestamp;
-	// $("fps").innerText = (1 / (this.deltaTime * 0.001)).toFixed (1);
 
 	this.shader.setMat4 (
 	    "view", this.camera.view

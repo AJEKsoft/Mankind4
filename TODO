@@ -4,3 +4,10 @@
 [ ] Fix camera perspective calculation
 [ ] Fix lighting calculation in shader
 [ ] IMPORTANT: messaging system for inter-class communication
+
+Considerations:
+
+* Packing color, lighting, and visible data into one byte — how?
+  Perhaps like so: 1 bit visible, 2 bits red, 2 bits green, 1 bit
+  blue, 2 bits lighting. This means we have 32 available colors, plus
+  4 lighting values.
