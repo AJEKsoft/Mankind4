@@ -25,6 +25,9 @@ class Game {
 	this.canvas.width = window.innerWidth;
 	this.canvas.height = window.innerHeight;
 	this.gl.viewport (0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
+	this.gl.enable (this.gl.DEPTH_TEST);
+	this.gl.enable (this.gl.CULL_FACE);
+	this.gl.cullFace (this.gl.FRONT);
 	this.gl.clearColor (0.3, 0.1, 0.5, 1.0);
 
 	this.camera = new Camera (this.gl);

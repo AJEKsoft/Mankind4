@@ -17,10 +17,15 @@
       #version 300 es
 
       in ivec2 vpos;
+      in uint color;
+      in uint extra;
 
+      out vec4 vcolor;
+      flat out uint von;
+      
       uniform mat4 view, projection;
 
-      const int chunkSize = 128;
+      const int chunkSize = 32;
       
       void main () {
 	  ivec3 voxel_pos = ivec3 (
@@ -31,6 +36,14 @@
 	  
 	  gl_Position = projection * view * vec4 (voxel_pos, 1.0);
 	  gl_Position.xy += vec2 (vpos.x, vpos.y);
+
+	  float r = float ((color >> 0) & uint (0x7)) / 7.0;
+	  float g = float ((color >> 3) & uint (0x7)) / 7.0;
+	  float b = float ((color >> 6) & uint (0x3)) / 3.0;
+
+	  vcolor = vec4 (r, g, b, 1.0);
+	  
+	  von = extra;
       }
     </script>
 
@@ -38,10 +51,17 @@
       #version 300 es
       precision highp float;
 
+      in vec4 vcolor;
+      flat in uint von;
+      
       out vec4 color;
 
       void main () {
-	  color = vec4 (1, 1, 1, 1);
+	  if (von == uint (1)) {
+	      color = vcolor;
+	  } else {
+	      discard;
+	  }
       }
     </script>
     
