@@ -33,7 +33,11 @@ class Game {
 	this.camera = new Camera (this.gl);
 	this.camera.position.z = -5.0;
 
+	this.chunk = new Chunk;
+	this.chunk.makeSphere ();
+	
 	this.chunkmesh = new ChunkMesh (this.gl);
+	this.chunkmesh.generate (this.chunk);
 	
 	// Question is, is passing a reference to the GL context a
 	// smart idea? Shouldn't some messaging system do that?

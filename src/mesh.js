@@ -33,6 +33,10 @@ class VertexMesh {
 const CHUNK_DIM = 32;
 const CHUNK_SIZE = CHUNK_DIM * CHUNK_DIM * CHUNK_DIM;
 
+function color8 (r, g, b) {
+    return ((r & 0x7) << 0) | ((g & 0x7) << 3) | ((b & 0x3) << 6);
+}
+
 class ChunkMesh {
     // Reference to current GL context.
     #gl;
@@ -94,9 +98,35 @@ class ChunkMesh {
 	this.#gl.vertexAttribIPointer (0, 2, this.#gl.BYTE, false, 0, 0);
 	this.#gl.vertexAttribDivisor (0, 0);
 
+	// Now, the indices.
+	this.#gl.bindBuffer (this.#gl.ELEMENT_ARRAY_BUFFER, this.#qebo);
+	this.#gl.bufferData (this.#gl.ELEMENT_ARRAY_BUFFER, new Uint8Array ([
+	    0, 1, 2,  0, 2, 3
+	]), this.#gl.STATIC_DRAW);
+    }
+
+    generate (chunk) {
+	// Based on the chunk given, we generate all the buffers.
+
+	// First, we generate the colors.
+	let colors = new Uint8Array (chunk.size);
+	for (let i = 0; i < chunk.size; ++i) {
+	    let color = chunk.voxels[i].color;
+	    let r = Math.floor (color.x * 7);
+	    let g = Math.floor (color.y * 7);
+	    let b = Math.floor (color.z * 3);
+	    colors[i] = color8 (r, g, b);
+	}
+
+	// Now, which voxels are visible and which are not.
+	let active = new Uint8Array (chunk.size);
+	for (let i = 0; i < chunk.size; ++i) {
+	    active[i] = chunk.voxels[i].active ? 1 : 0;
+	}
+	
 	// Generate the color buffer.
 	this.#gl.bindBuffer (this.#gl.ARRAY_BUFFER, this.#vcbo);
-	this.#gl.bufferData (this.#gl.ARRAY_BUFFER, new Uint8Array (this.colors), this.#gl.STATIC_DRAW);
+	this.#gl.bufferData (this.#gl.ARRAY_BUFFER, new Uint8Array (colors), this.#gl.STATIC_DRAW);
 	// The color of a voxel. Per instance.
 	this.#gl.enableVertexAttribArray (1);
 	this.#gl.vertexAttribIPointer (1, 1, this.#gl.UNSIGNED_BYTE, false, 0, 0);
@@ -104,17 +134,11 @@ class ChunkMesh {
 
 	// Generate the extra information buffer.
 	this.#gl.bindBuffer (this.#gl.ARRAY_BUFFER, this.#vebo);
-	this.#gl.bufferData (this.#gl.ARRAY_BUFFER, new Uint8Array (this.visible), this.#gl.STATIC_DRAW);
+	this.#gl.bufferData (this.#gl.ARRAY_BUFFER, new Uint8Array (active), this.#gl.STATIC_DRAW);
 	// Per-instance.
 	this.#gl.enableVertexAttribArray (2);
 	this.#gl.vertexAttribIPointer (2, 1, this.#gl.UNSIGNED_BYTE, false, 0, 0);
 	this.#gl.vertexAttribDivisor (2, 1);
-	
-	// Now, the indices.
-	this.#gl.bindBuffer (this.#gl.ELEMENT_ARRAY_BUFFER, this.#qebo);
-	this.#gl.bufferData (this.#gl.ELEMENT_ARRAY_BUFFER, new Uint8Array ([
-	    0, 1, 2,  0, 2, 3
-	]), this.#gl.STATIC_DRAW);
     }
 
     // This function fills the colors, visible, and lighting variables
