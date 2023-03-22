@@ -30,13 +30,7 @@ class Game {
 	this.camera = new Camera (this.gl);
 	this.camera.position.z = -5.0;
 
-	this.mesh = new VertexMesh (this.gl);
-	this.mesh.vertices = [
-	    -1, -1, 0,
-	    1, -1, 0,
-	    -1, 1, 0
-	]
-	this.mesh.realize ();
+	this.chunkmesh = new ChunkMesh (this.gl);
 	
 	// Question is, is passing a reference to the GL context a
 	// smart idea? Shouldn't some messaging system do that?
@@ -50,6 +44,19 @@ class Game {
 	    "projection", this.camera.projection
 	);
 
+	// Some basic input.
+	this.canvas.addEventListener ("click", this.onclick.bind (this), true);
+	this.canvas.addEventListener ("mousemove", this.onmousemove.bind (this), true);
+	
+	window.addEventListener ("keyup", this.onkeyup.bind (this), true);
+	window.addEventListener ("keydown", this.onkeydown.bind (this), true);
+
+	// Copied from MankindJS.
+	this.wpressed = false;
+	this.spressed = false;
+	this.apressed = false;
+	this.dpressed = false; 	// :-(
+	
 	this.lastTime = 0;
 	this.deltaTime = 0;
 	this.request = window.requestAnimationFrame (this.loop.bind (this));
@@ -64,19 +71,87 @@ class Game {
     update (timestamp) {
 	this.deltaTime = (timestamp - this.lastTime);
 	this.lastTime = timestamp;
-	$("fps").innerText = (1 / (this.deltaTime * 0.001)).toFixed (1);
+	// $("fps").innerText = (1 / (this.deltaTime * 0.001)).toFixed (1);
 
 	this.shader.setMat4 (
 	    "view", this.camera.view
 	);
+
+	if (this.wpressed) {
+	    this.camera.position = this.camera.position.add (
+		this.camera.direction.multiply (new Vec3 (this.deltaTime / 100))
+	    );
+	} else if (this.spressed) {
+	    this.camera.position = this.camera.position.subtract (
+		this.camera.direction.multiply (new Vec3 (this.deltaTime / 100))
+	    );	    
+	}
+
+	if (this.dpressed) {
+	    this.camera.position = this.camera.position.add (
+		this.camera.right.multiply (new Vec3 (this.deltaTime / 100))
+	    );	    
+	} else if (this.apressed) {
+	    this.camera.position = this.camera.position.subtract (
+		this.camera.right.multiply (new Vec3 (this.deltaTime / 100))
+	    );	    	    
+	}
     }
 
     render () {
 	this.gl.clear (this.gl.COLOR_BUFFER_BIT);
-	this.mesh.render ();
+	this.chunkmesh.render ();
+    }
+
+    onclick (event) {
+	this.canvas.requestPointerLock ();
+    }
+
+    onmousemove (event) {
+	let x = event.movementX;
+	let y = event.movementY;
+
+	this.camera.rotation.x -= x * (this.deltaTime / 10000);
+	this.camera.rotation.y -= y * (this.deltaTime / 10000);
+    }
+
+    onkeyup (event) {
+	switch (event.keyCode) {
+	case 87:
+	    this.wpressed = false;
+	    break;
+	case 83:
+	    this.spressed = false;
+	    break;
+	case 65:
+	    this.apressed = false;
+	    break;
+	case 68:
+	    this.dpressed = false;
+	    break;
+	}
+    }
+
+    onkeydown (event) {
+	switch (event.keyCode) {
+	    case 87:
+	    this.wpressed = true;
+	    break;
+	    case 83:
+	    this.spressed = true;
+	    break;
+	    case 65:
+	    this.apressed = true;
+	    break;
+	    case 68:
+	    this.dpressed = true;
+	    break;
+	}
     }
 }
 
+let game;
+
 window.onload = function () {
-    new Game;
+    game = new Game;
 }

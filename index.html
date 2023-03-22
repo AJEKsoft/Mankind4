@@ -16,12 +16,21 @@
     <script type="text/plain" id="chunk.vs" async>
       #version 300 es
 
-      in vec4 vpos;
+      in ivec2 vpos;
 
       uniform mat4 view, projection;
+
+      const int chunkSize = 128;
       
       void main () {
-	  gl_Position = view * projection * vpos;
+	  ivec3 voxel_pos = ivec3 (
+	      (gl_InstanceID / (chunkSize * chunkSize)) * 2,
+	      ((gl_InstanceID / chunkSize) % chunkSize) * 2,
+	      (gl_InstanceID % chunkSize) * 2
+	  );
+	  
+	  gl_Position = projection * view * vec4 (voxel_pos, 1.0);
+	  gl_Position.xy += vec2 (vpos.x, vpos.y);
       }
     </script>
 
