@@ -123,7 +123,7 @@ class ChunkMesh {
 	for (let i = 0; i < CHUNK_SIZE; ++i) {
 	    this.colors[i] = Math.floor (Math.random () * 255);
 
-	    if (Math.random () > 0.99) {
+	    if (Math.random () > 0.9) {
 		this.visible[i] = 1;
 	    } else {
 		this.visible[i] = 0;
