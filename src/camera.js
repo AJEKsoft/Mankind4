@@ -6,7 +6,7 @@ class Camera {
     // The camera's rotation.
     rotation = new Vec3;
     // The FOV.
-    fov = 90;
+    fov = 60;
     // The near plane.
     near = 0.01;
     // The far plane.

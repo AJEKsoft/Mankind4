@@ -34,7 +34,7 @@ class Game {
 	this.camera.position.z = -5.0;
 
 	this.chunk = new Chunk;
-	this.chunk.makeSphere ();
+	this.chunk.perlin ();
 	
 	this.chunkmesh = new ChunkMesh (this.gl);
 	this.chunkmesh.generate (this.chunk);

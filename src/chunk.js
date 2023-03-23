@@ -25,6 +25,20 @@ class Chunk {
 	}
     }
 
+    perlin () {
+	for (let x = 0; x < this.length; ++x) {
+	    for (let z = 0; z < this.length; ++z) {
+		let height = Math.abs (noise.simplex2 (x / this.length, z / this.length)) * this.length;
+
+		for (let y = 0; y < height / 2; ++y) {
+		    this.getAt (x, y, z).active = true;
+		    this.getAt (x, y, z).color = new Vec3 (0.0, Math.random () * (1.0 - 0.5) + 0.5, 0.0);
+		    this.getAt (x, y, z).light = 0.0;
+		}
+	    }
+	}
+    }
+    
     makeSphere () {
 	for (let z = 0; z < this.length; ++z) {
 	    for (let y = 0; y < this.length; ++y) {
@@ -32,7 +46,7 @@ class Chunk {
 		    if (Math.sqrt ((x - this.length / 2) * (x - this.length / 2) + (y - this.length / 2) * (y - this.length / 2) + (z - this.length / 2) * (z - this.length / 2)) <= this.length / 2) {
 			this.getAt (x, y, z).active = true;
 			this.getAt (x, y, z).color = new Vec3 (0.0, Math.random () * (1.0 - 0.5) + 0.5, 0.0);
-			this.getAt (x, y, z).light = 0.2;
+			this.getAt (x, y, z).light = 0.0;
 		    }
 		}
 	    }

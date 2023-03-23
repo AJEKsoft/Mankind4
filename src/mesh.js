@@ -105,8 +105,6 @@ class ChunkMesh {
 	    extra[i] |= active;
 	}
 
-	console.log (extra);
-	
 	// Generate the color buffer.
 	this.#gl.bindBuffer (this.#gl.ARRAY_BUFFER, this.#vcbo);
 	this.#gl.bufferData (this.#gl.ARRAY_BUFFER, new Uint8Array (colors), this.#gl.STATIC_DRAW);

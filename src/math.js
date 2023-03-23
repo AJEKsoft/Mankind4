@@ -100,7 +100,7 @@ function Mat4LookAt (from, to, up) {
 }
 
 function Mat4Perspective (vfovdeg, aspect, near, far) {
-    let vfovrad = vfovdeg / 180.0 * Math.PI;
+    let vfovrad = vfovdeg * (Math.PI / 180.0);
     let f = 1.0 / Math.tan (vfovrad / 2.0);
     
     return new Mat4 (
